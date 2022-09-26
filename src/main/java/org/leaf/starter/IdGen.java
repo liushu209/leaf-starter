@@ -1,12 +1,9 @@
-package com.jiangsilu.leaf;
+package org.leaf.starter;
 
 
-import com.jiangsilu.leaf.exception.LeafException;
+import org.leaf.starter.exception.LeafException;
 
-/**
- * @author sixuncle
- */
-public interface IDGen {
+public interface IdGen {
     /**
      * 获得id
      *

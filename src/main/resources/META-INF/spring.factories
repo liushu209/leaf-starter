@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.jiangsilu.leaf.config.LeafConfig
+  org.leaf.starter.config.LeafConfig

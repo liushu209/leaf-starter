@@ -1,11 +1,9 @@
-package com.jiangsilu.leaf;
+package org.leaf.starter.core;
 
-import com.jiangsilu.leaf.exception.LeafException;
+import org.leaf.starter.IdGen;
+import org.leaf.starter.exception.LeafException;
 
-/**
- * @author sixuncle
- */
-public class SnowflakeIDGenImpl implements IDGen {
+public class SnowflakeIDGenImpl implements IdGen {
 
     public SnowflakeIDGenImpl(SnowflakeZookeeperHolder snowflakeZookeeperHolder) throws Exception {
         snowflakeZookeeperHolder.init();
@@ -15,42 +13,28 @@ public class SnowflakeIDGenImpl implements IDGen {
     /**
      * 工作节点id
      */
-    private long workerId;
+    private final long workerId;
     /**
      * 序列号
      */
     private long sequence = 0L;
-    /**
-     * 起始时间
-     */
-    private long twepoch = 1288834974657L;
-
-    private final long workerIdBits = 10L;
-
-    private final long sequenceBits = 12L;
-
-    private final long maxWorkerId = ~(-1L << workerIdBits);
-
-    private final long workerIdShift = sequenceBits;
-
-    private final long timestampLeftShift = sequenceBits + workerIdBits;
-
-    private final long sequenceMask = ~(-1L << sequenceBits);
 
     private long lastTimestamp = -1L;
 
     /**
      * 获取下一个id
      *
-     * @return
+     * @return long
      */
     @Override
     public synchronized long get() throws LeafException {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
-            throw new LeafException(50000, "操作失败");
+            throw new LeafException("操作失败");
         }
+        long sequenceBits = 12L;
         if (timestamp == lastTimestamp) {
+            long sequenceMask = ~(-1L << sequenceBits);
             sequence = (sequence + 1) & sequenceMask;
             if (sequence == 0) {
                 timestamp = tilNextMillis(lastTimestamp);
@@ -59,7 +43,9 @@ public class SnowflakeIDGenImpl implements IDGen {
             sequence = 0L;
         }
         lastTimestamp = timestamp;
-        return (timestamp - twepoch) << timestampLeftShift | workerId << workerIdShift | sequence;
+        long workerIdBits = 10L;
+        long timestampLeftShift = sequenceBits + workerIdBits;
+        return (timestamp - 1288834974657L) << timestampLeftShift | workerId << sequenceBits | sequence;
     }
 
     /**
